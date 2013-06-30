@@ -1,0 +1,15 @@
+<resources>
+    
+    <!-- Strings related to login -->
+    <string name="prompt_url">URL</string>
+
+    <string name="action_load_feeds">Load Feeds</string>
+
+
+    <string name="login_progress_loading_feeds">Loading Feeds&#8230;</string>
+
+    <string name="error_invalid_url">This URL is invalid</string>
+    <string name="error_field_required">This field is required</string>
+
+    <string name="intro_text">Please enter the URL of your Feedo-Instance here.</string>
+</resources>

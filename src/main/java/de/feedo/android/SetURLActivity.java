@@ -40,10 +40,18 @@ public class SetURLActivity extends Activity {
 
     // Values for email and password at the time of the login attempt.
     private String mURL;
+    private String mUsername;
+    private String mPassword;
 
     // UI references.
     @InjectView(R.id.feedo_url)
     EditText mURLView;
+
+    @InjectView(R.id.feedo_username)
+    EditText mUsernameView;
+
+    @InjectView(R.id.feedo_password)
+    EditText mPasswordView;
 
     @InjectView(R.id.login_form)
     View mLoginFormView;
@@ -97,9 +105,13 @@ public class SetURLActivity extends Activity {
 
         // Reset errors.
         mURLView.setError(null);
+        mUsernameView.setError(null);
+        mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
         mURL = mURLView.getText().toString();
+        mUsername = mUsernameView.getText().toString();
+        mPassword = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -176,7 +188,9 @@ public class SetURLActivity extends Activity {
             AndroidHttpClient client = AndroidHttpClient.newInstance("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36");
 
             try {
-                client.execute(new HttpGet(mURL));
+                HttpGet request = new HttpGet(mURL);
+                //TODO: use Username and Password if supplied.
+                client.execute(request);
             } catch (IOException e) {
                 Log.e("feedo", "Login failed.", e);
                 return false;
@@ -191,6 +205,7 @@ public class SetURLActivity extends Activity {
             showProgress(false);
 
             if (success) {
+                //TODO: Save the URL, Username and the Password (but encrypt the Password!)
                 finish();
             } else {
                 mURLView.setError(getString(R.string.error_invalid_url));

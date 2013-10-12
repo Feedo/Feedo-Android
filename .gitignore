@@ -5,7 +5,9 @@
 .gradle/
 local.properties
 
-*/build/
+build/
 
 *~
 *.swp
+
+*.class

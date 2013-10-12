@@ -2,6 +2,8 @@
     
     <!-- Strings related to login -->
     <string name="prompt_url">URL</string>
+    <string name="prompt_username">Username (optional)</string>
+    <string name="prompt_password">Password (optional)</string>
 
     <string name="action_load_feeds">Load Feeds</string>
 
@@ -11,5 +13,5 @@
     <string name="error_invalid_url">This URL is invalid</string>
     <string name="error_field_required">This field is required</string>
 
-    <string name="intro_text">Please enter the URL of your Feedo-Instance here.</string>
+    <string name="intro_text">Hey there! To use this app with an instance of Feedo, please enter the URL of your Feedo-Instance here. If you are using User-Authentication, please enter your credentials, too. Otherwise, just leave those fields empty.</string>
 </resources>

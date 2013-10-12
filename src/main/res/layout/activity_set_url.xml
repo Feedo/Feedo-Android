@@ -47,6 +47,23 @@
                 android:inputType="textUri"
                 android:hint="@string/prompt_url" />
 
+            <EditText
+                android:id="@+id/feedo_username"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textUri"
+                android:hint="@string/prompt_username" />
+            <EditText
+                android:id="@+id/feedo_password"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textUri"
+                android:hint="@string/prompt_password" />
+
             <Button android:id="@+id/sign_in_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

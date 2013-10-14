@@ -4,11 +4,13 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -16,12 +18,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.json.JSONArray;
 
 import java.io.IOException;
 
 import butterknife.InjectView;
 import butterknife.Views;
+import de.feedo.android.net.FeedoApiHelper;
+import de.feedo.android.net.FeedoRestClient;
 
 /**
  * Activity which displays a login screen to the user, offering registration as
@@ -29,14 +38,11 @@ import butterknife.Views;
  */
 public class SetURLActivity extends Activity {
     /**
-     * The default email to populate the email field with.
+     * The default url to populate the email field with.
      */
     public static final String EXTRA_URL = "de.feedo.android.login.extra.URL";
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private TestURLTask mAuthTask = null;
+    public static final String EXTRA_USERNAME = "de.feedo.android.login.extra.USERNAME";
+    public static final String EXTRA_PASSWORD = "de.feedo.android.login.extra.PASSWORD";
 
     // Values for email and password at the time of the login attempt.
     private String mURL;
@@ -77,6 +83,12 @@ public class SetURLActivity extends Activity {
         mURL = getIntent().getStringExtra(EXTRA_URL);
         mURLView.setText(mURL);
 
+        mUsername = getIntent().getStringExtra(EXTRA_USERNAME);
+        mUsernameView.setText(mUsername);
+
+        mPassword = getIntent().getStringExtra(EXTRA_PASSWORD);
+        mPasswordView.setText(mPassword);
+
         mSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,10 +111,6 @@ public class SetURLActivity extends Activity {
      * errors are presented and no actual test-attempt is made.
      */
     public void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
-
         // Reset errors.
         mURLView.setError(null);
         mUsernameView.setError(null);
@@ -130,11 +138,39 @@ public class SetURLActivity extends Activity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            mLoginStatusMessageView.setText(R.string.login_progress_loading_feeds);
+            mLoginStatusMessageView.setText(R.string.login_progress_attempting_login);
             showProgress(true);
-            mAuthTask = new TestURLTask();
-            mAuthTask.execute((Void) null);
         }
+
+        FeedoApiHelper.testFeedoUrlAndUserdata(mURL, mUsername, mPassword, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(String response) {
+                if(response.equalsIgnoreCase("FEEDO")) {
+                    Intent intent = SetURLActivity.this.getIntent();
+                    intent.putExtra(EXTRA_URL, mURL);
+                    if(!mUsername.isEmpty() && !mPassword.isEmpty()) {
+                        intent.putExtra(EXTRA_USERNAME, mUsername);
+                        intent.putExtra(EXTRA_PASSWORD, mPassword);
+                    }
+                    SetURLActivity.this.setResult(RESULT_OK, intent);
+                    finish();
+                } else {
+                    mURLView.setError(getString(R.string.error_invalid_url));
+                    mURLView.requestFocus();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable e, String errorResponse) {
+                mURLView.setError(getString(R.string.error_invalid_url));
+                mURLView.requestFocus();
+            }
+
+            @Override
+            public void onFinish() {
+                showProgress(false);
+            }
+        });
     }
 
     /**
@@ -174,49 +210,6 @@ public class SetURLActivity extends Activity {
             // and hide the relevant UI components.
             mLoginStatusView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-    }
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class TestURLTask extends AsyncTask<Void, Void, Boolean> {
-        @Override
-        protected Boolean doInBackground(Void... params) {
-
-            AndroidHttpClient client = AndroidHttpClient.newInstance("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36");
-
-            try {
-                HttpGet request = new HttpGet(mURL);
-                //TODO: use Username and Password if supplied.
-                client.execute(request);
-            } catch (IOException e) {
-                Log.e("feedo", "Login failed.", e);
-                return false;
-            }
-
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                //TODO: Save the URL, Username and the Password (but encrypt the Password!)
-                finish();
-            } else {
-                mURLView.setError(getString(R.string.error_invalid_url));
-                mURLView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
         }
     }
 }

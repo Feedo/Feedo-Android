@@ -42,7 +42,7 @@ public class FeedsActivity extends ActionBarActivity {
     public static final String PREFERENCES_KEY_USERNAME = "username";
     public static final String PREFERENCES_KEY_PASSWORD = "password";
 
-    private static final int REQUEST_URL = 0x00042beef;
+    private static final int REQUEST_URL = 0xbeef;
 
     private SharedPreferences userDataPreferences;
 

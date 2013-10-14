@@ -80,13 +80,13 @@ public class FeedsActivity extends ActionBarActivity {
 
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
-                getActionBar().setTitle(mTitle);
+                getSupportActionBar().setTitle(mTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
-                getActionBar().setTitle(mDrawerTitle);
+                getSupportActionBar().setTitle(mDrawerTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
@@ -113,6 +113,8 @@ public class FeedsActivity extends ActionBarActivity {
         }
 
         refreshFeedList();
+
+        mDrawerLayout.openDrawer(Gravity.LEFT);
     }
 
     @Override

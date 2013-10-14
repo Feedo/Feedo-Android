@@ -46,11 +46,21 @@ public class FeedItemActivity extends ActionBarActivity {
         String content = mFeedItem.content;
         if(content.isEmpty())
             content = mFeedItem.summary;
-        String html = "<html><body>" + content + "</body></html>";
+        String html = "<html>" +
+                "<head>" +
+                "<style>img{\n" +
+                "  width: auto;\n" +
+                "  max-width: 100%;\n" +
+                "  height: auto;\n" +
+                "  max-height: 100%;\n" +
+                "}</style>" +
+                "</head>" +
+                "<body>"
+                + content + "</body>" +
+                "</html>";
         String mime = "text/html";
         String encoding = "utf-8";
 
-        mWebView.getSettings().setBuiltInZoomControls(true);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.loadDataWithBaseURL(mFeedItem.link, html, mime, encoding, null);
 

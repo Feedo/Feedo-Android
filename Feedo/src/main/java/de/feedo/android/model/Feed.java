@@ -14,19 +14,10 @@ public class Feed extends SugarRecord<Feed> {
     public String link;
     public String faviconUrl;
     public boolean hasUnread;
+    public int serverId;
 
     public Feed(Context ctx){
         super(ctx);
     }
 
-    public Feed(Context ctx, String description, String title, String fileUrl, String link, String faviconUrl, boolean hasUnread, long id) {
-        super(ctx);
-        this.setId(id);
-        this.description = description;
-        this.title = title;
-        this.fileUrl = fileUrl;
-        this.link = link;
-        this.faviconUrl = faviconUrl;
-        this.hasUnread = hasUnread;
-    }
 }

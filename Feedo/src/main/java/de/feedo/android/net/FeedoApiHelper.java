@@ -9,6 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import de.feedo.android.model.Feed;
 
 /**
@@ -29,26 +31,31 @@ public class FeedoApiHelper {
         for(int i = 0; i < response.length(); i++) {
             try {
                 JSONObject o = (JSONObject) response.get(i);
-                long id = o.getLong("id");
+                int id = o.getInt("id");
                 String description = o.getString("description");
                 String faviconUrl = o.getString("favicon_url");
+                if(faviconUrl.startsWith("img"))
+                    faviconUrl = FeedoRestClient.getAbsoluteUrl(faviconUrl);
                 String fileUrl = o.getString("file_url");
                 String link = o.getString("link");
                 String title = o.getString("title");
                 boolean hasUnread = o.getBoolean("has_unread");
 
-                if(Feed.findById(Feed.class, id) == null) {
-                    new Feed(ctx, description, title, fileUrl, link, faviconUrl, hasUnread, id).save();
-                } else {
-                    Feed f = Feed.findById(Feed.class, id);
-                    f.description = description;
-                    f.title = title;
-                    f.fileUrl = fileUrl;
-                    f.link = link;
-                    f.faviconUrl = faviconUrl;
-                    f.hasUnread = hasUnread;
-                    f.save();
+                List<Feed> feeds =  Feed.find(Feed.class, "server_id = ?", Integer.toString(id));
+                Feed f = null;
+                if(feeds.size() == 1)
+                    f = feeds.get(0);
+                if(f == null) {
+                    f = new Feed(ctx);
                 }
+                f.serverId = id;
+                f.description = description;
+                f.title = title;
+                f.fileUrl = fileUrl;
+                f.link = link;
+                f.faviconUrl = faviconUrl;
+                f.hasUnread = hasUnread;
+                f.save();
             } catch (JSONException e) {
                 e.printStackTrace();
             }

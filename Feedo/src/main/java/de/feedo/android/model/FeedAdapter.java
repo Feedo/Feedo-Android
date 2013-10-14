@@ -18,12 +18,10 @@ import de.feedo.android.R;
  */
 public class FeedAdapter extends ArrayAdapter<Feed> {
     private final Context context;
-    private final Feed[] values;
 
     public FeedAdapter(Context context, Feed[] objects) {
         super(context, R.layout.list_item_drawer_feed, objects);
         this.context = context;
-        this.values = objects;
     }
 
     @Override
@@ -31,12 +29,13 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.list_item_drawer_feed, parent, false);
-        TextView textView = (TextView) rowView.findViewById(R.id.label);
-        ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
-        textView.setText(values[position].title);
+        TextView textView = (TextView) rowView.findViewById(R.id.list_item_drawer_feed_label);
+        ImageView imageView = (ImageView) rowView.findViewById(R.id.list_item_drawer_feed_icon);
+        Feed f = this.getItem(position);
 
-        Picasso.with(context).load(values[position].faviconUrl).into(imageView);
-        Log.i("feedo", values[position].title);
+        textView.setText(f.title);
+
+        Picasso.with(context).load(f.faviconUrl).fit().centerCrop().into(imageView);
         return rowView;
     }
 }

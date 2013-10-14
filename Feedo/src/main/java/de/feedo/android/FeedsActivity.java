@@ -147,7 +147,11 @@ public class FeedsActivity extends ActionBarActivity {
 
     private void refreshFeedList() {
         List<Feed> feeds = Feed.listAll(Feed.class);
-        Feed[] feedArray = feeds.toArray(new Feed[feeds.size()]);
+        Feed[] feedArray = new Feed[feeds.size()];
+
+        for(int i = 0; i < feedArray.length; i++)
+            feedArray[i] = feeds.get(i);
+
         Log.i("feedo", "Yo! " + feedArray.length + " Feeds! (also "+feeds.size()+")");
         mDrawerListView.setAdapter(new FeedAdapter(this, feedArray));
 

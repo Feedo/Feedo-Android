@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="48dp">
     <ImageView
         android:id="@+id/list_item_drawer_feed_icon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="4dp"
-        android:src="@drawable/ic_launcher" >
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_launcher"
+        android:layout_marginLeft="10dp">
     </ImageView>
 
     <TextView
         android:id="@+id/list_item_drawer_feed_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@+id/label"
-        android:textSize="20sp" >
+        android:text="@string/app_name"
+        android:layout_gravity="center_vertical"
+        android:textSize="15sp"
+        android:layout_marginLeft="10dp">
     </TextView>
 </LinearLayout>

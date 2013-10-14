@@ -49,7 +49,7 @@ public class FeedoRestClient {
         client.post(getAbsoluteUrl(url), params, responseHandler);
     }
 
-    private static String getAbsoluteUrl(String relativeUrl) {
+    public static String getAbsoluteUrl(String relativeUrl) {
         return rootUrl + "/" + relativeUrl;
     }
 }

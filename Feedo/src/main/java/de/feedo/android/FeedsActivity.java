@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,7 +60,7 @@ public class FeedsActivity extends ActionBarActivity {
     @InjectView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
 
-
+    private List<Feed> mFeeds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +93,7 @@ public class FeedsActivity extends ActionBarActivity {
 
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.LEFT);
 
         mDrawerListView.setBackgroundColor(getResources().getColor(android.R.color.background_light));
 
@@ -146,13 +148,13 @@ public class FeedsActivity extends ActionBarActivity {
     }
 
     private void refreshFeedList() {
-        List<Feed> feeds = Feed.listAll(Feed.class);
-        Feed[] feedArray = new Feed[feeds.size()];
+        mFeeds = Feed.listAll(Feed.class);
+        Feed[] feedArray = new Feed[mFeeds.size()];
 
         for(int i = 0; i < feedArray.length; i++)
-            feedArray[i] = feeds.get(i);
+            feedArray[i] = mFeeds.get(i);
 
-        Log.i("feedo", "Yo! " + feedArray.length + " Feeds! (also "+feeds.size()+")");
+        Log.i("feedo", "Yo! " + feedArray.length + " Feeds! (also "+mFeeds.size()+")");
         mDrawerListView.setAdapter(new FeedAdapter(this, feedArray));
 
     }

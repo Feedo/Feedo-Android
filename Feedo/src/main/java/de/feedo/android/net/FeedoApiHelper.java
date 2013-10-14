@@ -2,6 +2,7 @@ package de.feedo.android.net;
 
 import android.content.Context;
 
+import com.activeandroid.query.Select;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -12,6 +13,7 @@ import org.json.JSONObject;
 import java.util.List;
 
 import de.feedo.android.model.Feed;
+import de.feedo.android.model.FeedItem;
 
 /**
  * Created by Jan-Henrik on 14.10.13.
@@ -25,6 +27,55 @@ public class FeedoApiHelper {
 
     public static void getFeeds(JsonHttpResponseHandler h) {
         FeedoRestClient.get("api/feeds", null, h);
+    }
+
+    public static void getFeedItems(Feed feed, JsonHttpResponseHandler h) {
+        FeedoRestClient.get("api/feeds/" + feed.serverId + "/items", null, h);
+    }
+
+    public static void putFeedItemsFromJsonToFeed(Context ctx, Feed f, JSONArray response) {
+        for(int i = 0; i < response.length(); i++) {
+            try {
+                JSONObject o = (JSONObject) response.get(i);
+
+                int id = o.getInt("id");
+                String author = o.getString("author");
+                String content = o.getString("content");
+                String image = o.getString("image");
+                String itemGuid = o.getString("item_guid");
+                String link = o.getString("link");
+                String published = o.getString("published");
+                boolean read = o.getBoolean("read");
+                String summary = o.getString("summary");
+                String title = o.getString("title");
+
+                FeedItem fi = new Select().from(FeedItem.class).where("serverId = ?", id).executeSingle();
+
+                if(fi == null) {
+                    fi = new FeedItem();
+                }
+
+                fi.serverId = id;
+                fi.author = author;
+                fi.content = content;
+                fi.image = image;
+                fi.itemGuid = itemGuid;
+                fi.link = link;
+                fi.published = published;
+                fi.read = read;
+                fi.summary = summary;
+                fi.title = title;
+                fi.feed = f;
+
+                fi.save();
+                f.items().add(fi);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+        f.save();
     }
 
     public static void saveFeedsFromJsonToDB(Context ctx, JSONArray response) {
@@ -41,13 +92,11 @@ public class FeedoApiHelper {
                 String title = o.getString("title");
                 boolean hasUnread = o.getBoolean("has_unread");
 
-                List<Feed> feeds =  Feed.find(Feed.class, "server_id = ?", Integer.toString(id));
-                Feed f = null;
-                if(feeds.size() == 1)
-                    f = feeds.get(0);
+                Feed f = new Select().from(Feed.class).where("serverId = ?", id).executeSingle();
                 if(f == null) {
-                    f = new Feed(ctx);
+                    f = new Feed();
                 }
+
                 f.serverId = id;
                 f.description = description;
                 f.title = title;

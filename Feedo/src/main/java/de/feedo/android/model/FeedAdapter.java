@@ -17,16 +17,14 @@ import de.feedo.android.R;
  * Created by Jan-Henrik on 14.10.13.
  */
 public class FeedAdapter extends ArrayAdapter<Feed> {
-    private final Context context;
 
     public FeedAdapter(Context context, Feed[] objects) {
         super(context, R.layout.list_item_drawer_feed, objects);
-        this.context = context;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context
+        LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.list_item_drawer_feed, parent, false);
         TextView textView = (TextView) rowView.findViewById(R.id.list_item_drawer_feed_label);
@@ -35,7 +33,7 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
 
         textView.setText(f.title);
 
-        Picasso.with(context).load(f.faviconUrl).fit().centerCrop().into(imageView);
+        Picasso.with(getContext()).load(f.faviconUrl).fit().centerCrop().into(imageView);
         return rowView;
     }
 }

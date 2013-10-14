@@ -1,5 +1,7 @@
 package de.feedo.android;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -14,9 +16,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
+import com.activeandroid.query.Select;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -76,7 +80,7 @@ public class FeedsActivity extends ActionBarActivity {
         mTitle = mDrawerTitle = getTitle();
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                R.drawable.ic_drawer, R.string.action_load_feeds, R.string.app_name) {
+                R.drawable.ic_drawer, R.string.app_name, R.string.app_name) {
 
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
@@ -96,6 +100,7 @@ public class FeedsActivity extends ActionBarActivity {
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.LEFT);
 
         mDrawerListView.setBackgroundColor(getResources().getColor(android.R.color.background_light));
+        mDrawerListView.setOnItemClickListener(feedItemClicklistener);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -150,7 +155,7 @@ public class FeedsActivity extends ActionBarActivity {
     }
 
     private void refreshFeedList() {
-        mFeeds = Feed.listAll(Feed.class);
+        mFeeds = new Select().from(Feed.class).execute();
         Feed[] feedArray = new Feed[mFeeds.size()];
 
         for(int i = 0; i < feedArray.length; i++)
@@ -204,4 +209,21 @@ public class FeedsActivity extends ActionBarActivity {
             loadFeedsFromServer();
         }
     }
+
+    private AdapterView.OnItemClickListener feedItemClicklistener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            FeedsActivity.this.mFeeds.get(i).loadFeedItems(FeedsActivity.this);
+
+            android.support.v4.app.FragmentManager m = FeedsActivity.this.getSupportFragmentManager();
+            android.support.v4.app.FragmentTransaction t = m.beginTransaction();
+
+            FeedItemListFragment f = new FeedItemListFragment();
+            Bundle args = new Bundle();
+            args.putLong(FeedItemListFragment.ARGUMENT_KEY_FEED_ID, mFeeds.get(i).getId());
+            f.setArguments(args);
+            t.replace(R.id.feed_item_list_frame, f);
+            t.commit();
+        }
+    };
 }

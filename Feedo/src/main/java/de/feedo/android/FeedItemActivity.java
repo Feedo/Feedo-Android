@@ -37,12 +37,21 @@ public class FeedItemActivity extends ActionBarActivity {
     }
 
     private void setupUI() {
-        String html = "<html><body>" + mFeedItem.content + "</body></html>";
+        String content = mFeedItem.content;
+        if(content.isEmpty())
+            content = mFeedItem.summary;
+        String html = "<html><body>" + content + "</body></html>";
         String mime = "text/html";
         String encoding = "utf-8";
 
+        mWebView.getSettings().setBuiltInZoomControls(true);
         mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.loadDataWithBaseURL(null, html, mime, encoding, null);
+        mWebView.loadDataWithBaseURL(mFeedItem.link, html, mime, encoding, null);
+
+        mFeedItem.read = true;
+        mFeedItem.save();
+
+        this.setTitle(mFeedItem.title);
     }
 
     private void setupActionBar() {

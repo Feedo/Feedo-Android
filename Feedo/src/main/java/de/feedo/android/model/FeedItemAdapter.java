@@ -1,6 +1,8 @@
 package de.feedo.android.model;
 
 import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,13 +12,15 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 import de.feedo.android.R;
 
 /**
  * Created by Jan-Henrik on 14.10.13.
  */
 public class FeedItemAdapter extends ArrayAdapter<FeedItem> {
-    public FeedItemAdapter(Context context, FeedItem[] items) {
+    public FeedItemAdapter(Context context, List<FeedItem> items) {
         super(context, R.layout.list_item_feed_item, items);
     }
 
@@ -25,11 +29,19 @@ public class FeedItemAdapter extends ArrayAdapter<FeedItem> {
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.list_item_feed_item, parent, false);
-        TextView textView = (TextView) rowView.findViewById(R.id.feed_item_title);
+        TextView titleTextView = (TextView) rowView.findViewById(R.id.feed_item_title);
+        TextView summaryTextView = (TextView) rowView.findViewById(R.id.feed_item_summary);
 
         FeedItem fi = this.getItem(position);
 
-        textView.setText(fi.title);
+        Spanned summarySpanned = Html.fromHtml(fi.summary);
+        String summary = "";
+
+        if(summarySpanned.length() > 100)
+            summary = summarySpanned.subSequence(0, 100)+"...";
+
+        titleTextView.setText(fi.title);
+        summaryTextView.setText(summary.isEmpty() ? summarySpanned : summary);
 
         return rowView;
     }

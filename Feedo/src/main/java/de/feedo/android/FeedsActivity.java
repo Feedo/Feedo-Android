@@ -2,6 +2,7 @@ package de.feedo.android;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -58,13 +59,12 @@ public class FeedsActivity extends ActionBarActivity {
     @InjectView(R.id.feed_list)
     ListView mDrawerListView;
 
-    @InjectView(R.id.feed_item_list_frame)
-    FrameLayout mFeedItemListFrame;
-
     @InjectView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
 
     private List<Feed> mFeeds;
+
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +76,8 @@ public class FeedsActivity extends ActionBarActivity {
         setContentView(R.layout.activity_feeds);
 
         Views.inject(this);
+
+        mHandler = new Handler();
 
         mTitle = mDrawerTitle = getTitle();
 
@@ -175,13 +177,27 @@ public class FeedsActivity extends ActionBarActivity {
 
             @Override
             public void onFinish() {
-                setLoading(false);
             }
 
             @Override
             public void onSuccess(JSONArray response) {
-                FeedoApiHelper.saveFeedsFromJsonToDB(FeedsActivity.this, response);
-                refreshFeedList();
+                final JSONArray array = response;
+                new Thread(new Runnable(){
+
+                    @Override
+                    public void run() {
+                        FeedoApiHelper.saveFeedsFromJsonToDB(FeedsActivity.this, array);
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                refreshFeedList();
+                                setLoading(false);
+                            }
+                        });
+                    }
+                }).start();
+
+
             }
         });
     }
@@ -212,18 +228,31 @@ public class FeedsActivity extends ActionBarActivity {
 
     private AdapterView.OnItemClickListener feedItemClicklistener = new AdapterView.OnItemClickListener() {
         @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            FeedsActivity.this.mFeeds.get(i).loadFeedItems(FeedsActivity.this);
+        public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+            new Thread(new Runnable(){
 
-            android.support.v4.app.FragmentManager m = FeedsActivity.this.getSupportFragmentManager();
-            android.support.v4.app.FragmentTransaction t = m.beginTransaction();
+                @Override
+                public void run() {
+                    FeedsActivity.this.mFeeds.get(i).loadFeedItems(FeedsActivity.this);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            android.support.v4.app.FragmentManager m = FeedsActivity.this.getSupportFragmentManager();
+                            android.support.v4.app.FragmentTransaction t = m.beginTransaction();
 
-            FeedItemListFragment f = new FeedItemListFragment();
-            Bundle args = new Bundle();
-            args.putLong(FeedItemListFragment.ARGUMENT_KEY_FEED_ID, mFeeds.get(i).getId());
-            f.setArguments(args);
-            t.replace(R.id.feed_item_list_frame, f);
-            t.commit();
+                            FeedItemListFragment f = new FeedItemListFragment();
+                            Bundle args = new Bundle();
+                            args.putLong(FeedItemListFragment.ARGUMENT_KEY_FEED_ID, mFeeds.get(i).getId());
+                            f.setArguments(args);
+                            t.replace(R.id.feed_item_list_frame, f);
+                            t.commit();
+
+                            mDrawerLayout.closeDrawer(Gravity.LEFT);
+                        }
+                    });
+                }
+            }).start();
+
         }
     };
 }

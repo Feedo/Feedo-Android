@@ -2,6 +2,7 @@ package de.feedo.android;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,22 +21,31 @@ public class FeedItemListFragment extends ListFragment {
     public static final String ARGUMENT_KEY_FEED_ID = "feed_id";
 
     private Feed mFeed;
+    private Handler mHandler;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        long feedId = getArguments().getLong(ARGUMENT_KEY_FEED_ID);
+        final long feedId = getArguments().getLong(ARGUMENT_KEY_FEED_ID);
         Log.i("feedo", "FeedId is " + feedId);
-        mFeed = Feed.load(Feed.class, feedId);
-        refreshFeedItems();
+        mHandler = new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mFeed = Feed.load(Feed.class, feedId);
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshFeedItems();
+                    }
+                });
+            }
+        }).start();
+
         this.getListView().setOnItemClickListener(feedItemClickListener);
     }
 
     public void refreshFeedItems() {
-        FeedItem[] feedItemArray = new FeedItem[mFeed.items().size()];
-
-        for(int i = 0; i < feedItemArray.length; i++)
-            feedItemArray[i] = mFeed.items().get(i);
-        this.setListAdapter(new FeedItemAdapter(getActivity(), feedItemArray));
+        this.setListAdapter(new FeedItemAdapter(getActivity(), mFeed.items()));
     }
 
     private AdapterView.OnItemClickListener feedItemClickListener = new AdapterView.OnItemClickListener() {

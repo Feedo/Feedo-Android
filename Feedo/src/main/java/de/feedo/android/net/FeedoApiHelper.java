@@ -27,6 +27,10 @@ public class FeedoApiHelper {
         FeedoRestClient.get("api/info", null, h);
     }
 
+    public static void updateFeedItems(AsyncHttpResponseHandler h) {
+        FeedoRestClient.get("api/update_feeds", null, h);
+    }
+
     public static void getFeeds(JsonHttpResponseHandler h) {
         FeedoRestClient.get("api/feeds", null, h);
     }

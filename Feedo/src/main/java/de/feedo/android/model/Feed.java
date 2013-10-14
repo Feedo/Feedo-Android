@@ -38,14 +38,19 @@ public class Feed extends Model {
         return getMany(FeedItem.class, "Feed");
     }
 
-    public void loadFeedItems(final Context ctx) {
+    public void loadFeedItems(final Context ctx, final FeedItemsUpdatedListener l) {
         FeedoApiHelper.getFeedItems(this, new JsonHttpResponseHandler(){
 
             @Override
             public void onSuccess(JSONArray response) {
                 FeedoApiHelper.putFeedItemsFromJsonToFeed(ctx, Feed.this, response);
+                l.updatingFinished(Feed.this);
             }
         });
+    }
+
+    public interface FeedItemsUpdatedListener {
+        public void updatingFinished(Feed feed);
     }
 
 }

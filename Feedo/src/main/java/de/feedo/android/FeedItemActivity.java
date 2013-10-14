@@ -66,6 +66,7 @@ public class FeedItemActivity extends ActionBarActivity {
 
         mFeedItem.read = true;
         mFeedItem.save();
+
         FeedoApiHelper.setFeedItemRead(mFeedItem, new JsonHttpResponseHandler(){
             @Override
             public void onFailure(Throwable e, JSONObject errorResponse) {

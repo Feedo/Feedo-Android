@@ -1,3 +1,11 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:icon="@drawable/ic_launcher" android:id="@+id/action_item_refresh" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:yourapp="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_refresh"
+        android:icon="@drawable/ic_action_refresh"
+        android:title="@string/action_refresh"
+        yourapp:showAsAction="ifRoom"  />
+    <item android:id="@+id/action_add"
+        android:icon="@drawable/ic_action_new"
+        android:title="@string/action_add"
+        yourapp:showAsAction="ifRoom"  />
 </menu>

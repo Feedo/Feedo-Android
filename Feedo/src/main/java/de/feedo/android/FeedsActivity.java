@@ -14,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -22,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.activeandroid.query.Select;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -70,7 +72,6 @@ public class FeedsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_PROGRESS);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
         setContentView(R.layout.activity_feeds);
@@ -132,6 +133,31 @@ public class FeedsActivity extends ActionBarActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.start, menu);
+
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void refreshEverything() {
+        FeedoApiHelper.updateFeedItems(new AsyncHttpResponseHandler(){
+            @Override
+            public void onStart() {
+                setLoading(true);
+            }
+
+            @Override
+            public void onFinish() {
+                setLoading(false);
+                refreshFeedList();
+            }
+        });
+    }
+
+    @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
@@ -151,7 +177,12 @@ public class FeedsActivity extends ActionBarActivity {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        // Handle your other action bar items...
+
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                refreshEverything();
+                return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -165,7 +196,6 @@ public class FeedsActivity extends ActionBarActivity {
 
         Log.i("feedo", "Yo! " + feedArray.length + " Feeds! (also "+mFeeds.size()+")");
         mDrawerListView.setAdapter(new FeedAdapter(this, feedArray));
-
     }
 
     private void loadFeedsFromServer() {
@@ -229,30 +259,18 @@ public class FeedsActivity extends ActionBarActivity {
     private AdapterView.OnItemClickListener feedItemClicklistener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
-            new Thread(new Runnable(){
+            android.support.v4.app.FragmentManager m = FeedsActivity.this.getSupportFragmentManager();
+            android.support.v4.app.FragmentTransaction t = m.beginTransaction();
 
-                @Override
-                public void run() {
-                    FeedsActivity.this.mFeeds.get(i).loadFeedItems(FeedsActivity.this);
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            android.support.v4.app.FragmentManager m = FeedsActivity.this.getSupportFragmentManager();
-                            android.support.v4.app.FragmentTransaction t = m.beginTransaction();
+            FeedItemListFragment f = new FeedItemListFragment();
+            Bundle args = new Bundle();
+            args.putLong(FeedItemListFragment.ARGUMENT_KEY_FEED_ID, mFeeds.get(i).getId());
+            f.setArguments(args);
+            t.replace(R.id.feed_item_list_frame, f);
+            t.commit();
 
-                            FeedItemListFragment f = new FeedItemListFragment();
-                            Bundle args = new Bundle();
-                            args.putLong(FeedItemListFragment.ARGUMENT_KEY_FEED_ID, mFeeds.get(i).getId());
-                            f.setArguments(args);
-                            t.replace(R.id.feed_item_list_frame, f);
-                            t.commit();
-
-                            mDrawerLayout.closeDrawer(Gravity.LEFT);
-                        }
-                    });
-                }
-            }).start();
-
+            mTitle = mFeeds.get(i).title;
+            mDrawerLayout.closeDrawer(Gravity.LEFT);
         }
     };
 }

@@ -1,10 +1,16 @@
 package de.feedo.android;
 
-import android.app.Activity;
+import android.support.v7.app.ActionBarActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -25,7 +31,7 @@ import de.feedo.android.util.ObscuredSharedPreferences;
 /**
  * Created by jhbruhn on 30.06.13.
  */
-public class FeedsActivity extends Activity {
+public class FeedsActivity extends ActionBarActivity {
     public static final String PREFERENCES_USERDATA_NAME = "UserData";
 
     public static final String PREFERENCES_KEY_URL = "url";
@@ -36,11 +42,19 @@ public class FeedsActivity extends Activity {
 
     private SharedPreferences userDataPreferences;
 
+    private ActionBarDrawerToggle mDrawerToggle;
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
+
     @InjectView(R.id.feed_list)
     ListView mDrawerListView;
 
     @InjectView(R.id.feed_item_list_frame)
     FrameLayout mFeedItemListFrame;
+
+    @InjectView(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
+
 
 
     @Override
@@ -50,9 +64,36 @@ public class FeedsActivity extends Activity {
         requestWindowFeature(Window.FEATURE_PROGRESS);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
-        FeedoRestClient.loadUserData(this);
+        setContentView(R.layout.activity_feeds);
 
         Views.inject(this);
+
+        mTitle = mDrawerTitle = getTitle();
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+                R.drawable.ic_drawer, R.string.action_load_feeds, R.string.app_name) {
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                getActionBar().setTitle(mTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                getActionBar().setTitle(mDrawerTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+
+        FeedoRestClient.loadUserData(this);
+
 
         userDataPreferences = new ObscuredSharedPreferences(
                 this, this.getSharedPreferences(PREFERENCES_USERDATA_NAME, Context.MODE_PRIVATE));
@@ -62,6 +103,38 @@ public class FeedsActivity extends Activity {
         } else {
             loadFeedsFromServer();
         }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerListView);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        // Handle your other action bar items...
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void loadFeedsFromServer() {
@@ -78,33 +151,7 @@ public class FeedsActivity extends Activity {
 
             @Override
             public void onSuccess(JSONArray response) {
-                for(int i = 0; i < response.length(); i++) {
-                    try {
-                        JSONObject o = (JSONObject) response.get(i);
-                        long id = o.getLong("id");
-                        String description = o.getString("description");
-                        String faviconUrl = o.getString("favicon_url");
-                        String fileUrl = o.getString("file_url");
-                        String link = o.getString("link");
-                        String title = o.getString("title");
-                        boolean hasUnread = o.getBoolean("has_unread");
-
-                        if(Feed.findById(Feed.class, id) == null) {
-                            new Feed(FeedsActivity.this, description, title, fileUrl, link, faviconUrl, hasUnread, id).save();
-                        } else {
-                            Feed f = Feed.findById(Feed.class, id);
-                            f.description = description;
-                            f.title = title;
-                            f.fileUrl = fileUrl;
-                            f.link = link;
-                            f.faviconUrl = faviconUrl;
-                            f.hasUnread = hasUnread;
-                            f.save();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
+                FeedoApiHelper.saveFeedsFromJsonToDB(FeedsActivity.this, response);
             }
         });
     }

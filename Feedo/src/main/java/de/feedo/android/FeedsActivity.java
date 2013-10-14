@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,9 +22,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import butterknife.InjectView;
 import butterknife.Views;
 import de.feedo.android.model.Feed;
+import de.feedo.android.model.FeedAdapter;
 import de.feedo.android.net.FeedoApiHelper;
 import de.feedo.android.net.FeedoRestClient;
 import de.feedo.android.util.ObscuredSharedPreferences;
@@ -89,8 +93,10 @@ public class FeedsActivity extends ActionBarActivity {
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+        mDrawerListView.setBackgroundColor(getResources().getColor(android.R.color.background_light));
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         FeedoRestClient.loadUserData(this);
 
@@ -103,6 +109,8 @@ public class FeedsActivity extends ActionBarActivity {
         } else {
             loadFeedsFromServer();
         }
+
+        refreshFeedList();
     }
 
     @Override
@@ -137,6 +145,14 @@ public class FeedsActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void refreshFeedList() {
+        List<Feed> feeds = Feed.listAll(Feed.class);
+        Feed[] feedArray = feeds.toArray(new Feed[feeds.size()]);
+        Log.i("feedo", "Yo! " + feedArray.length + " Feeds! (also "+feeds.size()+")");
+        mDrawerListView.setAdapter(new FeedAdapter(this, feedArray));
+
+    }
+
     private void loadFeedsFromServer() {
         FeedoApiHelper.getFeeds(new JsonHttpResponseHandler(){
             @Override
@@ -152,6 +168,7 @@ public class FeedsActivity extends ActionBarActivity {
             @Override
             public void onSuccess(JSONArray response) {
                 FeedoApiHelper.saveFeedsFromJsonToDB(FeedsActivity.this, response);
+                refreshFeedList();
             }
         });
     }

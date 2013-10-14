@@ -6,10 +6,12 @@ import com.activeandroid.query.Select;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.apache.http.entity.StringEntity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import de.feedo.android.model.Feed;
@@ -31,6 +33,19 @@ public class FeedoApiHelper {
 
     public static void getFeedItems(Feed feed, JsonHttpResponseHandler h) {
         FeedoRestClient.get("api/feeds/" + feed.serverId + "/items", null, h);
+    }
+
+    public static void setFeedItemRead(FeedItem fi, JsonHttpResponseHandler h) {
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("read", fi.read);
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            FeedoRestClient.put("api/feeds/" + fi.feed.serverId + "/items/" + fi.serverId, entity, "appilcation/json", h);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void putFeedItemsFromJsonToFeed(Context ctx, Feed f, JSONArray response) {

@@ -3,6 +3,7 @@ package de.feedo.android;
 import android.os.Bundle;
 import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
@@ -10,9 +11,14 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.webkit.WebView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONObject;
+
 import butterknife.InjectView;
 import butterknife.Views;
 import de.feedo.android.model.FeedItem;
+import de.feedo.android.net.FeedoApiHelper;
 
 public class FeedItemActivity extends ActionBarActivity {
     public static final String EXTRAS_KEY_FEED_ITEM_ID = "feed_item_id";
@@ -50,6 +56,13 @@ public class FeedItemActivity extends ActionBarActivity {
 
         mFeedItem.read = true;
         mFeedItem.save();
+        FeedoApiHelper.setFeedItemRead(mFeedItem, new JsonHttpResponseHandler(){
+            @Override
+            public void onFailure(Throwable e, JSONObject errorResponse) {
+                Log.i("feedo", errorResponse.toString());
+
+            }
+        });
 
         this.setTitle(mFeedItem.title);
     }

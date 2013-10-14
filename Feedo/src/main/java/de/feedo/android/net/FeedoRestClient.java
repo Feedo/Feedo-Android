@@ -8,6 +8,8 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.apache.http.HttpEntity;
+
 import de.feedo.android.FeedsActivity;
 import de.feedo.android.util.ObscuredSharedPreferences;
 
@@ -19,6 +21,7 @@ public class FeedoRestClient {
 
     private static AsyncHttpClient client = new AsyncHttpClient();;
     private static String rootUrl;
+    private static Context context;
 
     public static void loadUserData(Context c) {
         userDataPreferences = new ObscuredSharedPreferences(
@@ -30,6 +33,8 @@ public class FeedoRestClient {
             client.setBasicAuth(username, password);
             rootUrl = userDataPreferences.getString(FeedsActivity.PREFERENCES_KEY_URL, "");
         }
+
+        FeedoRestClient.context = c;
     }
 
     public static void setRootUrl(String rootUrl) {
@@ -45,8 +50,14 @@ public class FeedoRestClient {
         Log.i("feedo", "Getting " + getAbsoluteUrl(url));
     }
 
-    public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        client.post(getAbsoluteUrl(url), params, responseHandler);
+    public static void post(String url, HttpEntity httpEntity, String contentType, AsyncHttpResponseHandler responseHandler) {
+        client.post(context, getAbsoluteUrl(url), httpEntity, contentType, responseHandler);
+    }
+
+    public static void put(String url, HttpEntity httpEntity, String contentType, AsyncHttpResponseHandler responseHandler) {
+        client.put(context, getAbsoluteUrl(url), httpEntity, contentType, responseHandler);
+        Log.i("feedo", "Putting " + getAbsoluteUrl(url));
+
     }
 
     public static String getAbsoluteUrl(String relativeUrl) {

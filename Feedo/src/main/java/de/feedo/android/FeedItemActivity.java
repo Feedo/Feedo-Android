@@ -1,14 +1,10 @@
 package de.feedo.android;
 
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.webkit.WebView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;

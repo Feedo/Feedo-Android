@@ -12,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 import de.feedo.android.model.Feed;
 import de.feedo.android.model.FeedItem;

@@ -9,7 +9,6 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.feedo.android.net.FeedoApiHelper;

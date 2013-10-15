@@ -5,13 +5,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.net.http.AndroidHttpClient;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Base64;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -19,18 +15,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.JsonHttpResponseHandler;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.json.JSONArray;
-
-import java.io.IOException;
 
 import butterknife.InjectView;
 import butterknife.Views;
 import de.feedo.android.net.FeedoApiHelper;
-import de.feedo.android.net.FeedoRestClient;
 
 /**
  * Activity which displays a login screen to the user, offering registration as

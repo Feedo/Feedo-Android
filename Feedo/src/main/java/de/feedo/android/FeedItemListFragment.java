@@ -17,7 +17,7 @@ import de.feedo.android.model.FeedItemAdapter;
 /**
  * Created by Jan-Henrik on 14.10.13.
  */
-public class FeedItemListFragment extends ListFragment {
+public class FeedItemListFragment extends ListFragment implements uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener  {
 
 
     public static final String ARGUMENT_KEY_FEED_ID = "feed_id";
@@ -28,9 +28,28 @@ public class FeedItemListFragment extends ListFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        ((FeedsActivity) getActivity()).mPullToRefreshAttacher.addRefreshableView(this.getListView(), this);
         mFeedId = getArguments().getLong(ARGUMENT_KEY_FEED_ID);
         Log.i("feedo", "FeedId is " + mFeedId);
         mHandler = new Handler();
+        onRefreshStarted(view);
+        this.getListView().setOnItemClickListener(feedItemClickListener);
+    }
+
+    public void refreshFeedItems() {
+        Log.i("feedo", getActivity().toString());
+        Log.i("feedo", mFeed.items().toString());
+        if(mFeed.items().size() > 0)
+            this.setListAdapter(new FeedItemAdapter(getActivity(), mFeed.items()));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        this.getListView().invalidateViews();
+    }
+
+    public void onRefreshStarted(View view) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -48,26 +67,13 @@ public class FeedItemListFragment extends ListFragment {
                             @Override
                             public void run() {
                                 refreshFeedItems();
+                                ((FeedsActivity) getActivity()).mPullToRefreshAttacher.setRefreshComplete();
                             }
                         });
                     }
                 });
             }
         }).start();
-        this.getListView().setOnItemClickListener(feedItemClickListener);
-    }
-
-    public void refreshFeedItems() {
-        Log.i("feedo", getActivity().toString());
-        Log.i("feedo", mFeed.items().toString());
-        if(mFeed.items().size() > 0)
-            this.setListAdapter(new FeedItemAdapter(getActivity(), mFeed.items()));
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        this.getListView().invalidateViews();
     }
 
     private AdapterView.OnItemClickListener feedItemClickListener = new AdapterView.OnItemClickListener() {

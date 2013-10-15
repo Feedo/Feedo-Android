@@ -43,7 +43,7 @@ import de.feedo.android.util.ObscuredSharedPreferences;
 /**
  * Created by jhbruhn on 30.06.13.
  */
-public class FeedsActivity extends ActionBarActivity {
+public class FeedsActivity extends ActionBarActivity implements uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener {
     public static final String PREFERENCES_USERDATA_NAME = "UserData";
 
     public static final String PREFERENCES_KEY_URL = "url";
@@ -68,6 +68,8 @@ public class FeedsActivity extends ActionBarActivity {
 
     private Handler mHandler;
 
+    public uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher mPullToRefreshAttacher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +79,10 @@ public class FeedsActivity extends ActionBarActivity {
         setContentView(R.layout.activity_feeds);
 
         Views.inject(this);
+
+        mPullToRefreshAttacher = uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.get(this);
+
+        mPullToRefreshAttacher.addRefreshableView(mDrawerListView, this);
 
         mHandler = new Handler();
 
@@ -152,9 +158,14 @@ public class FeedsActivity extends ActionBarActivity {
             @Override
             public void onFinish() {
                 setLoading(false);
-                refreshFeedList();
+                loadFeedsFromServer();
             }
         });
+    }
+
+    public void onRefreshStarted(View view) {
+        loadFeedsFromServer();
+
     }
 
     @Override
@@ -189,13 +200,19 @@ public class FeedsActivity extends ActionBarActivity {
 
     private void refreshFeedList() {
         mFeeds = new Select().from(Feed.class).execute();
-        Feed[] feedArray = new Feed[mFeeds.size()];
+        final Feed[] feedArray = new Feed[mFeeds.size()];
 
         for(int i = 0; i < feedArray.length; i++)
             feedArray[i] = mFeeds.get(i);
 
         Log.i("feedo", "Yo! " + feedArray.length + " Feeds! (also "+mFeeds.size()+")");
-        mDrawerListView.setAdapter(new FeedAdapter(this, feedArray));
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mDrawerListView.setAdapter(new FeedAdapter(FeedsActivity.this, feedArray));
+                mPullToRefreshAttacher.setRefreshComplete();
+            }
+        });
     }
 
     private void loadFeedsFromServer() {
@@ -217,10 +234,11 @@ public class FeedsActivity extends ActionBarActivity {
                     @Override
                     public void run() {
                         FeedoApiHelper.saveFeedsFromJsonToDB(FeedsActivity.this, array);
+                        refreshFeedList();
+
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                refreshFeedList();
                                 setLoading(false);
                             }
                         });

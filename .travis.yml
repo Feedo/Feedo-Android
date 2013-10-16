@@ -32,5 +32,5 @@ script:
     
 after_success:
     - touch dropbox_conf_empty.conf
-    - bash dropbox_uploader.sh upload Feedo/build/apk/Feedo-release-unsigned.apk FeedoNightly.apk -f dropbox_conf_empty.conf 
-    - bash dropbox_uploader.sh share FeedoNightly.apk -f dropbox_conf_empty.conf 
+    - bash dropbox_uploader.sh -f ./dropbox_conf_empty.conf upload Feedo/build/apk/Feedo-release-unsigned.apk FeedoNightly.apk 
+    - bash dropbox_uploader.sh -f ./dropbox_conf_empty.conf share FeedoNightly.apk 

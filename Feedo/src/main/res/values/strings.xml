@@ -10,4 +10,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_add">Add Feed</string>
+    <string name="title_activity_create_feed">CreateFeedActivity</string>
+    <string name="add_feed">Add Feed</string>
+    <string name="intro_add_feed">To add a Feed, simply put it\'s RSS or ATOM URL into the Textbox below and press the button.</string>
+    <string name="loading_add_feed">Adding Feed…</string>
 </resources>

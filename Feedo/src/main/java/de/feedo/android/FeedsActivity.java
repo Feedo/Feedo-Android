@@ -205,6 +205,9 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
                     isRefreshing = true;
                 }
                 return true;
+            case R.id.action_add:
+                startActivity(new Intent(this, CreateFeedActivity.class));
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

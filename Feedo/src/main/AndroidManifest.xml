@@ -44,6 +44,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.feedo.android.FeedsActivity" />
         </activity>
+        <activity
+            android:name="de.feedo.android.CreateFeedActivity"
+            android:label="@string/title_activity_create_feed"
+            android:parentActivityName="de.feedo.android.FeedsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.feedo.android.FeedsActivity" />
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

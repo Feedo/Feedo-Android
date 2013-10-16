@@ -13,7 +13,7 @@ import java.util.List;
 
 import de.feedo.android.model.Feed;
 import de.feedo.android.model.FeedItem;
-import de.feedo.android.model.FeedItemAdapter;
+import de.feedo.android.model.adapters.FeedItemAdapter;
 
 /**
  * Created by Jan-Henrik on 14.10.13.

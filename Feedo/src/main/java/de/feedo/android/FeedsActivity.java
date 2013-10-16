@@ -28,7 +28,7 @@ import java.util.List;
 import butterknife.InjectView;
 import butterknife.Views;
 import de.feedo.android.model.Feed;
-import de.feedo.android.model.FeedAdapter;
+import de.feedo.android.model.adapters.FeedAdapter;
 import de.feedo.android.model.FeedItem;
 import de.feedo.android.net.FeedoApiHelper;
 import de.feedo.android.util.ObscuredSharedPreferences;

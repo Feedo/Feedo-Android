@@ -21,8 +21,7 @@ import butterknife.Views;
 import de.feedo.android.net.FeedoApiHelper;
 
 /**
- * Activity which displays a login screen to the user, offering registration as
- * well.
+ * Activity which displays a login screen to the user.
  */
 public class SetURLActivity extends Activity {
     /**
@@ -89,7 +88,7 @@ public class SetURLActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.start, menu);
+        getMenuInflater().inflate(R.menu.feed_list, menu);
         return true;
     }
 

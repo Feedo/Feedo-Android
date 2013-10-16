@@ -14,4 +14,5 @@
     <string name="add_feed">Add Feed</string>
     <string name="intro_add_feed">To add a Feed, simply put it\'s RSS or ATOM URL into the Textbox below and press the button.</string>
     <string name="loading_add_feed">Adding Feed…</string>
+    <string name="delete">Delete</string>
 </resources>

@@ -10,6 +10,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +29,7 @@ import butterknife.InjectView;
 import butterknife.Views;
 import de.feedo.android.model.Feed;
 import de.feedo.android.model.FeedAdapter;
+import de.feedo.android.model.FeedItem;
 import de.feedo.android.net.FeedoApiHelper;
 import de.feedo.android.util.ObscuredSharedPreferences;
 import retrofit.Callback;
@@ -107,6 +109,8 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
 
         mDrawerListView.setBackgroundColor(getResources().getColor(android.R.color.background_light));
         mDrawerListView.setOnItemClickListener(feedItemClicklistener);
+        mDrawerListView.setOnItemLongClickListener(feedItemLongClickListener);
+        registerForContextMenu(mDrawerListView);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -139,10 +143,59 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.start, menu);
+        inflater.inflate(R.menu.feed_list, menu);
 
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+
+        menu.setHeaderTitle(((Feed) mDrawerListView.getAdapter().getItem(info.position)).title);
+
+        getMenuInflater().inflate(R.menu.context_feed_drawer, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        switch(item.getItemId()) {
+            case R.id.delete_feed:
+
+                final Feed f = (Feed) mDrawerListView.getAdapter().getItem(info.position);
+                FeedoApiHelper.getFeedoService().deleteFeed(f.serverId, new Callback<Feed>() {
+                    @Override
+                    public void success(Feed feed, Response response) {
+                        Log.i("feedo", "Successfully deleted feed!");
+                    }
+
+                    @Override
+                    public void failure(RetrofitError retrofitError) {
+                        Log.e("feedo", "Error while deleting feed!", retrofitError);
+                    }
+                });
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for(FeedItem fi : f.items()) {
+                            fi.delete();
+                        }
+                        f.delete();
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                refreshFeedList();
+                            }
+                        });
+                    }
+                }).start();
+
+                return true;
+        }
+        return false;
     }
 
     private void refreshEverything() {
@@ -236,6 +289,14 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
                     @Override
                     public void run() {
                         for (Feed f : feeds) {
+                            try {
+                                if(f.items() != null) {
+                                    for(FeedItem fi : f.items())
+                                        fi.save();
+                                }
+                            } catch(NullPointerException e) {
+
+                            }
                             f.save();
                         }
 
@@ -261,10 +322,6 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
             }
         });
 
-    }
-
-    private void setLoading(boolean loading) {
-        setProgressBarIndeterminateVisibility(loading);
     }
 
     @Override
@@ -302,6 +359,16 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
 
             mTitle = mFeeds.get(i).title;
             mDrawerLayout.closeDrawer(Gravity.LEFT);
+        }
+    };
+
+    private AdapterView.OnItemLongClickListener feedItemLongClickListener = new AdapterView.OnItemLongClickListener() {
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                       int position, long id) {
+
+            return false;
         }
     };
 }

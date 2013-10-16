@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_create_feed">Feed hinzufügen</string>
+    <string name="button_add_feed">Feed hinzufügen</string>
+    <string name="intro_add_feed">Um einen Feed hinzuzufügen, einfach die URL in die Textbox eingeben und auf den Knopf drücken.</string>
+    <string name="loading_add_feed">Feed wird hinzugefügt…</string>
+    <string name="error_invalid_feed_url">Das ist kein gültiger Feed.</string>
+    <string name="error_feed_exists">Dieser Feed wurde bereits hinzugefügt.</string>
+</resources>

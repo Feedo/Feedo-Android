@@ -72,10 +72,10 @@ public class CreateFeedActivity extends ActionBarActivity {
                 if(r != null) {
                     switch(r.getStatus()) {
                         case (400): // No URL or invalid
-                            mUrlEditText.setError("This URL is not a valid RSS/ATOM Feed!");
+                            mUrlEditText.setError(CreateFeedActivity.this.getString(R.string.error_invalid_feed_url));
                             break;
                         case (409): // Conflict
-                            mUrlEditText.setError("You already added this Feed!");
+                            mUrlEditText.setError(CreateFeedActivity.this.getString(R.string.error_feed_exists));
 
                             break;
                     }

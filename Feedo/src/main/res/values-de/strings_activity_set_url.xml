@@ -1,0 +1,18 @@
+<resources>
+    
+    <!-- Strings related to login -->
+    <string name="prompt_url">URL</string>
+    <string name="prompt_username">Benutzername (optional)</string>
+    <string name="prompt_password">Passwort (optional)</string>
+
+    <string name="action_load_feeds">Feeds laden</string>
+
+
+    <string name="login_progress_loading_feeds">Lade Feeds&#8230;</string>
+    <string name="login_progress_attempting_login">Versuche Login&#8230;</string>
+
+    <string name="error_invalid_url">Die URL ist ungültig oder die Benutzername/Passwort-Kombination ist falsch.</string>
+    <string name="error_field_required">Dieses Feld muss ausgefüllt werden.</string>
+
+    <string name="intro_text">Yo! Um diese App mit einer Feedo-Instanz zu benutzen, gib bitte die URL zur Instanz hier ein. Wenn du Authentifizierung benutzt, gib bitte auch deine Benutzerdaten ein. Wenn nicht, lass die beiden Felder einfach leer.</string>
+</resources>

@@ -1,4 +1,4 @@
-package de.feedo.android.model;
+package de.feedo.android.model.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,6 +13,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import de.feedo.android.R;
+import de.feedo.android.model.Feed;
 
 /**
  * Created by Jan-Henrik on 14.10.13.

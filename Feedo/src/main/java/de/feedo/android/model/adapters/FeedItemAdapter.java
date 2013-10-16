@@ -1,4 +1,4 @@
-package de.feedo.android.model;
+package de.feedo.android.model.adapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 import de.feedo.android.R;
+import de.feedo.android.model.FeedItem;
 import de.feedo.android.util.DateParser;
 
 /**

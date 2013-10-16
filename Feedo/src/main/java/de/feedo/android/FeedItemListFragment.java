@@ -90,7 +90,11 @@ public class FeedItemListFragment extends ListFragment implements uk.co.senab.ac
                             @Override
                             public void run() {
                                 refreshFeedItems();
+                                try {
                                 ((FeedsActivity) getActivity()).mPullToRefreshAttacher.setRefreshComplete();
+                                } catch(NullPointerException e) {
+
+                                }
                             }
                         });
                     }

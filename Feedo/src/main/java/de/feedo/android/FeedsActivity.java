@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Gravity;
@@ -35,6 +36,7 @@ import de.feedo.android.util.ObscuredSharedPreferences;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshAttacher;
 
 /**
  * Created by jhbruhn on 30.06.13.
@@ -64,7 +66,7 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
 
     private Handler mHandler;
 
-    public uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher mPullToRefreshAttacher;
+    public PullToRefreshAttacher mPullToRefreshAttacher;
 
     private boolean isRefreshing = false;
 
@@ -79,7 +81,7 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
 
         Views.inject(this);
 
-        mPullToRefreshAttacher = uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.get(this);
+        mPullToRefreshAttacher = PullToRefreshAttacher.get(this);
 
         mPullToRefreshAttacher.addRefreshableView(mDrawerListView, this);
 
@@ -93,13 +95,13 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 getSupportActionBar().setTitle(mTitle);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                supportInvalidateOptionsMenu();
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 getSupportActionBar().setTitle(mDrawerTitle);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                supportInvalidateOptionsMenu();
             }
         };
 
@@ -121,7 +123,7 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
         userDataPreferences = new ObscuredSharedPreferences(
                 this, this.getSharedPreferences(PREFERENCES_USERDATA_NAME, Context.MODE_PRIVATE));
 
-        if(userDataPreferences.getString(PREFERENCES_KEY_URL, "").isEmpty()) {
+        if(TextUtils.isEmpty(userDataPreferences.getString(PREFERENCES_KEY_URL, ""))) {
             this.startActivityForResult(new Intent(this, SetURLActivity.class), REQUEST_URL);
         } else {
             loadFeedsFromServer();
@@ -330,8 +332,8 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
             SharedPreferences.Editor ed = userDataPreferences.edit();
             ed.putString(PREFERENCES_KEY_URL, e.getString(SetURLActivity.EXTRA_URL));
             if(e.containsKey(SetURLActivity.EXTRA_USERNAME) && e.containsKey(SetURLActivity.EXTRA_PASSWORD)) {
-                ed.putString(PREFERENCES_KEY_USERNAME, e.getString(SetURLActivity.EXTRA_USERNAME, ""));
-                ed.putString(PREFERENCES_KEY_PASSWORD, e.getString(SetURLActivity.EXTRA_PASSWORD, ""));
+                ed.putString(PREFERENCES_KEY_USERNAME, e.getString(SetURLActivity.EXTRA_USERNAME));
+                ed.putString(PREFERENCES_KEY_PASSWORD, e.getString(SetURLActivity.EXTRA_PASSWORD));
             }
             ed.commit();
 

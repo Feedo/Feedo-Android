@@ -20,11 +20,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.activeandroid.query.Select;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.JsonHttpResponseHandler;
 
-import org.json.JSONArray;
-
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.InjectView;
@@ -32,8 +29,10 @@ import butterknife.Views;
 import de.feedo.android.model.Feed;
 import de.feedo.android.model.FeedAdapter;
 import de.feedo.android.net.FeedoApiHelper;
-import de.feedo.android.net.FeedoRestClient;
 import de.feedo.android.util.ObscuredSharedPreferences;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by jhbruhn on 30.06.13.
@@ -65,11 +64,14 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
 
     public uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher mPullToRefreshAttacher;
 
+    private boolean isRefreshing = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        supportRequestWindowFeature(Window.FEATURE_PROGRESS);
 
         setContentView(R.layout.activity_feeds);
 
@@ -109,7 +111,7 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        FeedoRestClient.loadUserData(this);
+        FeedoApiHelper.loadUserData(this);
 
 
         userDataPreferences = new ObscuredSharedPreferences(
@@ -144,18 +146,30 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
     }
 
     private void refreshEverything() {
-        FeedoApiHelper.updateFeedItems(new AsyncHttpResponseHandler(){
+        FeedsActivity.this.setSupportProgressBarVisibility(true);
+        FeedoApiHelper.updateFeedItems(new FeedoApiHelper.FeedUpdateListener() {
             @Override
-            public void onStart() {
-                setLoading(true);
+            public void onProgress(final int progress, final int total) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        FeedsActivity.this.setSupportProgress((int) ((float) progress / total) * 1000);
+                    }
+                });
             }
 
             @Override
-            public void onFinish() {
-                setLoading(false);
-                loadFeedsFromServer();
+            public void onFinished() {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        FeedsActivity.this.setSupportProgressBarVisibility(false);
+                        isRefreshing = false;
+                    }
+                });
             }
         });
+
     }
 
     public void onRefreshStarted(View view) {
@@ -186,7 +200,10 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
 
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                refreshEverything();
+                if(!isRefreshing) {
+                    refreshEverything();
+                    isRefreshing = true;
+                }
                 return true;
         }
 
@@ -195,54 +212,52 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
 
     private void refreshFeedList() {
         mFeeds = new Select().from(Feed.class).execute();
-        final Feed[] feedArray = new Feed[mFeeds.size()];
-
-        for(int i = 0; i < feedArray.length; i++)
-            feedArray[i] = mFeeds.get(i);
-
-        Log.i("feedo", "Yo! " + feedArray.length + " Feeds! (also "+mFeeds.size()+")");
+        Collections.sort(mFeeds);
+        Log.i("feed", mFeeds.toString());
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mDrawerListView.setAdapter(new FeedAdapter(FeedsActivity.this, feedArray));
+                if(mFeeds.size() > 0) {
+                    mDrawerListView.setAdapter(new FeedAdapter(FeedsActivity.this, mFeeds));
+                }
                 mPullToRefreshAttacher.setRefreshComplete();
             }
         });
     }
 
     private void loadFeedsFromServer() {
-        FeedoApiHelper.getFeeds(new JsonHttpResponseHandler(){
+        FeedoApiHelper.getFeedoService().listFeeds(new Callback<List<Feed>>() {
             @Override
-            public void onStart() {
-                setLoading(true);
-            }
-
-            @Override
-            public void onFinish() {
-            }
-
-            @Override
-            public void onSuccess(JSONArray response) {
-                final JSONArray array = response;
-                new Thread(new Runnable(){
-
+            public void success(final List<Feed> feeds, Response response) {
+                new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        FeedoApiHelper.saveFeedsFromJsonToDB(FeedsActivity.this, array);
-                        refreshFeedList();
+                        for (Feed f : feeds) {
+                            f.save();
+                        }
 
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                setLoading(false);
+                                FeedsActivity.this.refreshFeedList();
                             }
                         });
                     }
                 }).start();
 
+            }
 
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                try {
+                    Log.e("feed", "retrofit error!", retrofitError);
+                    Log.e("feedo", "StatusCode: " + retrofitError.getResponse().getStatus() + ", Reason: " + retrofitError.getResponse().getReason());
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
             }
         });
+
     }
 
     private void setLoading(boolean loading) {
@@ -263,7 +278,7 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
             }
             ed.commit();
 
-            FeedoRestClient.loadUserData(this);
+            FeedoApiHelper.loadUserData(this);
 
             loadFeedsFromServer();
         }

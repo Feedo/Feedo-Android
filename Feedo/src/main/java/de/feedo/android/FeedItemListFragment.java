@@ -8,36 +8,64 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 
+import java.util.Collections;
+import java.util.List;
+
 import de.feedo.android.model.Feed;
+import de.feedo.android.model.FeedItem;
 import de.feedo.android.model.FeedItemAdapter;
 
 /**
  * Created by Jan-Henrik on 14.10.13.
  */
 public class FeedItemListFragment extends ListFragment implements uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener  {
-
-
     public static final String ARGUMENT_KEY_FEED_ID = "feed_id";
 
     private long mFeedId;
     private Feed mFeed;
     private Handler mHandler;
+    private FeedItemAdapter mFeedItemAdapter;
+    private List<FeedItem> mFeedItems;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         ((FeedsActivity) getActivity()).mPullToRefreshAttacher.addRefreshableView(this.getListView(), this);
+
         mFeedId = getArguments().getLong(ARGUMENT_KEY_FEED_ID);
+
         Log.i("feedo", "FeedId is " + mFeedId);
         mHandler = new Handler();
+
         onRefreshStarted(view);
+
         this.getListView().setOnItemClickListener(feedItemClickListener);
     }
 
     public void refreshFeedItems() {
         Log.i("feedo", getActivity().toString());
-        Log.i("feedo", mFeed.items().toString());
-        if(mFeed.items().size() > 0)
-            this.setListAdapter(new FeedItemAdapter(getActivity(), mFeed.items()));
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mFeedItems = mFeed.items();
+                Collections.sort(mFeedItems);
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(mFeedItems.size() > 0) {
+                            if(FeedItemListFragment.this.mFeedItemAdapter == null) {
+                                FeedItemListFragment.this.mFeedItemAdapter = new FeedItemAdapter(getActivity(), mFeedItems);
+                                FeedItemListFragment.this.setListAdapter(mFeedItemAdapter);
+                            } else {
+                                FeedItemListFragment.this.mFeedItemAdapter.notifyDataSetChanged();
+                            }
+                        }
+                    }
+                });
+
+            }
+        }).start();
+
     }
 
     @Override

@@ -7,14 +7,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 
-import com.loopj.android.http.JsonHttpResponseHandler;
-
-import org.json.JSONObject;
-
 import butterknife.InjectView;
 import butterknife.Views;
 import de.feedo.android.model.FeedItem;
 import de.feedo.android.net.FeedoApiHelper;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class FeedItemActivity extends ActionBarActivity {
     public static final String EXTRAS_KEY_FEED_ITEM_ID = "feed_item_id";
@@ -36,6 +35,25 @@ public class FeedItemActivity extends ActionBarActivity {
         // Show the Up button in the action bar.
         setupActionBar();
         setupUI();
+
+
+        mFeedItem.read = true;
+        mFeedItem.save();
+
+        FeedoApiHelper.getFeedoService().updateFeedItem(mFeedItem.feed.serverId, mFeedItem.serverId, mFeedItem, new Callback<FeedItem>() {
+            @Override
+            public void success(FeedItem feedItem, Response response) {
+                FeedItemActivity.this.mFeedItem = feedItem;
+                mFeedItem.save();
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                Log.e("feedo", "Error updating FeedItem", retrofitError);
+            }
+        });
+
+
     }
 
     private void setupUI() {
@@ -60,16 +78,6 @@ public class FeedItemActivity extends ActionBarActivity {
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.loadDataWithBaseURL(mFeedItem.link, html, mime, encoding, null);
 
-        mFeedItem.read = true;
-        mFeedItem.save();
-
-        FeedoApiHelper.setFeedItemRead(mFeedItem, new JsonHttpResponseHandler(){
-            @Override
-            public void onFailure(Throwable e, JSONObject errorResponse) {
-                Log.i("feedo", errorResponse.toString());
-
-            }
-        });
 
         this.setTitle(mFeedItem.title);
     }

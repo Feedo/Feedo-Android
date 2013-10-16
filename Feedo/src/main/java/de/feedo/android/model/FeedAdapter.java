@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 import de.feedo.android.R;
 
 /**
@@ -17,7 +19,7 @@ import de.feedo.android.R;
  */
 public class FeedAdapter extends ArrayAdapter<Feed> {
 
-    public FeedAdapter(Context context, Feed[] objects) {
+    public FeedAdapter(Context context, List<Feed> objects) {
         super(context, R.layout.list_item_drawer_feed, objects);
     }
 
@@ -32,7 +34,7 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
 
         textView.setText(f.title);
 
-        Picasso.with(getContext()).load(f.faviconUrl).fit().centerCrop().into(imageView);
+        Picasso.with(getContext()).load(f.favicon_url).fit().centerCrop().into(imageView);
         return rowView;
     }
 }

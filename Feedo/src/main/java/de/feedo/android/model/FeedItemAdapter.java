@@ -23,7 +23,6 @@ import de.feedo.android.util.DateParser;
  */
 public class FeedItemAdapter extends ArrayAdapter<FeedItem> {
     public FeedItemAdapter(Context context, List<FeedItem> items) {
-
         super(context, R.layout.list_item_feed_item, items);
     }
 

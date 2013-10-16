@@ -106,8 +106,14 @@ public class SetURLActivity extends Activity {
 
         // Store values at the time of the login attempt.
         mURL = mURLView.getText().toString();
-        mUsername = mUsernameView.getText().toString();
-        mPassword = mPasswordView.getText().toString();
+        if(mURL != null && !mURL.startsWith("http")) {
+            mURL = "http://" + mURL;
+        }
+
+        mURL = mURL.trim();
+
+        mUsername = mUsernameView.getText().toString().trim();
+        mPassword = mPasswordView.getText().toString().trim();
 
         boolean cancel = false;
         View focusView = null;

@@ -26,8 +26,7 @@ before_install:
     - echo yes | android update sdk --filter sysimg-18 --no-ui --force
     - echo yes | android update sdk --filter extra-android-support --no-ui --force
     - echo yes | android update sdk --filter extra-android-m2repository --no-ui --force
-    - wget https://raw.github.com/graingert/Dropbox-Uploader/patch-1/dropbox_uploader.sh
-  -O dropbox_uploader.sh
+    - wget https://raw.github.com/graingert/Dropbox-Uploader/patch-1/dropbox_uploader.sh -O dropbox_uploader.sh
 script:
     - ./gradlew build
     

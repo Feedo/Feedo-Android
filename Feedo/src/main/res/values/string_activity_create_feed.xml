@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_create_feed">Add Feed</string>
+    <string name="button_add_feed">Add Feed</string>
+    <string name="intro_add_feed">To add a Feed, simply put it\'s RSS or ATOM URL into the Textbox below and press the button.</string>
+    <string name="loading_add_feed">Adding Feed…</string>
+</resources>

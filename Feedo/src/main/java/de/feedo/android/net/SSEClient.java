@@ -34,30 +34,23 @@ import javax.net.ssl.TrustManager;
  * Created by Jan-Henrik on 15.10.13.
  */
 public class SSEClient {
-    private static final String TAG = "WebSocketClient";
+    private static final String TAG = "SSEClient";
 
     private URI mURI;
-    private Listener                 mListener;
+    private Listener mListener;
     private Socket mSocket;
-    private Thread                   mThread;
+    private Thread mThread;
     private HandlerThread mHandlerThread;
     private Handler mHandler;
     private List<BasicNameValuePair> mExtraHeaders;
-    private boolean                  mConnected;
-
-    private final Object mSendLock = new Object();
 
     private static TrustManager[] sTrustManagers;
 
-    public static void setTrustManagers(TrustManager[] tm) {
-        sTrustManagers = tm;
-    }
 
     public SSEClient(URI uri, Listener listener, List<BasicNameValuePair> extraHeaders) {
-        mURI          = uri;
-        mListener     = listener;
+        mURI = uri;
+        mListener = listener;
         mExtraHeaders = extraHeaders;
-        mConnected    = false;
 
         mHandlerThread = new HandlerThread("websocket-thread");
         mHandlerThread.start();
@@ -88,8 +81,6 @@ public class SSEClient {
 
                     SocketFactory factory = (mURI.getScheme().equals("https")) ? getSSLSocketFactory() : SocketFactory.getDefault();
                     mSocket = factory.createSocket(mURI.getHost(), port);
-
-                    Log.i("feedo", "sending request...");
 
                     PrintWriter out = new PrintWriter(mSocket.getOutputStream());
                     out.print("GET " + path + " HTTP/1.1\r\n");
@@ -128,13 +119,12 @@ public class SSEClient {
 
                     mListener.onConnect();
 
-                    mConnected = true;
 
-                    while(true) {
+                    while (true) {
                         String currentEvent = "";
-                        String currentData = "";
+                        String currentData;
                         while (!TextUtils.isEmpty(line = readLine(stream))) {
-                            if(line.startsWith("event: "))
+                            if (line.startsWith("event: "))
                                 currentEvent = line.replace("event: ", "").trim();
                             else if (line.startsWith("data: ")) {
                                 currentData = line.replace("data: ", "").trim();
@@ -146,13 +136,11 @@ public class SSEClient {
                 } catch (EOFException ex) {
                     Log.d(TAG, "SSE EOF!", ex);
                     mListener.onDisconnect(0, "EOF");
-                    mConnected = false;
 
                 } catch (SSLException ex) {
                     // Connection reset by peer
                     Log.d(TAG, "SSE SSL error!", ex);
                     mListener.onDisconnect(0, "SSL");
-                    mConnected = false;
 
                 } catch (Exception ex) {
                     mListener.onError(ex);
@@ -201,8 +189,11 @@ public class SSEClient {
 
     public interface Listener {
         public void onConnect();
+
         public void onMessage(String message, String data);
+
         public void onDisconnect(int code, String reason);
+
         public void onError(Exception error);
     }
 

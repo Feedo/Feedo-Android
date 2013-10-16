@@ -44,7 +44,7 @@ public class Feed extends Model implements Comparable<Feed> {
     @Expose
     public boolean has_unread;
 
-    @Column(name = "serverId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "serverId", unique = true, onUniqueConflict = Column.ConflictAction.IGNORE)
     @SerializedName("id")
     @Expose
     public int serverId;
@@ -53,7 +53,7 @@ public class Feed extends Model implements Comparable<Feed> {
         return getMany(FeedItem.class, "Feed");
     }
 
-    public void loadFeedItems(final Context ctx, final FeedItemsUpdatedListener l) {
+    public void loadFeedItems(final FeedItemsUpdatedListener l) {
         FeedoApiHelper.getFeedoService().listFeedItems(this.serverId, new Callback<List<FeedItem>>() {
             @Override
             public void success(List<FeedItem> feedItems, Response response) {

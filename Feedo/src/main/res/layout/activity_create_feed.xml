@@ -55,7 +55,7 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/add_feed"
+                android:text="@string/button_add_feed"
                 android:id="@+id/add_feed_add_button"
                 android:layout_marginTop="13dp"
                 android:layout_gravity="right" />

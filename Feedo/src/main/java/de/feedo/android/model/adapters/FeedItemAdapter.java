@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,17 +39,22 @@ public class FeedItemAdapter extends ArrayAdapter<FeedItem> {
 
         FeedItem fi = this.getItem(position);
 
-        Spanned summarySpanned = Html.fromHtml(fi.summary);
-        String summary = "";
+        if(!TextUtils.isEmpty(fi.content)) {
+            Spanned summarySpanned = Html.fromHtml(fi.summary);
+            String summary = "";
 
-        if(summarySpanned.length() > 100)
-            summary = summarySpanned.subSequence(0, 100)+"...";
+            if(summarySpanned.length() > 100)
+                summary = summarySpanned.subSequence(0, 100) + "...";
+
+            summaryTextView.setText(TextUtils.isEmpty(summary) ? summarySpanned : summary);
+
+            if(TextUtils.isEmpty(summary) && TextUtils.isEmpty(summarySpanned.toString()))
+                summaryTextView.setVisibility(View.GONE);
+        } else {
+            summaryTextView.setVisibility(View.GONE);
+        }
 
         titleTextView.setText(fi.title);
-        summaryTextView.setText(summary.isEmpty() ? summarySpanned : summary);
-
-        if(summary.isEmpty() && summarySpanned.toString().isEmpty())
-            summaryTextView.setVisibility(View.GONE);
 
         Date date = null;
         try {

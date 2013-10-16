@@ -30,36 +30,49 @@ public class FeedItemActivity extends ActionBarActivity {
 
         Views.inject(this);
 
-        mFeedItem = FeedItem.load(FeedItem.class, getIntent().getLongExtra(EXTRAS_KEY_FEED_ITEM_ID, 0));
+        long feedItemId = getIntent().getLongExtra(EXTRAS_KEY_FEED_ITEM_ID, 0);
+
+        Log.i("feedo", "FeedItem id is "+feedItemId);
+
+
+        mFeedItem = FeedItem.load(FeedItem.class, feedItemId);
+
+        Log.i("feedo", "FeedItem is "+mFeedItem);
+
 
         // Show the Up button in the action bar.
         setupActionBar();
         setupUI();
 
 
-        mFeedItem.read = true;
-        mFeedItem.save();
+        if(mFeedItem != null) {
+            mFeedItem.read = true;
+            mFeedItem.save();
 
-        FeedoApiHelper.getFeedoService().updateFeedItem(mFeedItem.feed.serverId, mFeedItem.serverId, mFeedItem, new Callback<FeedItem>() {
-            @Override
-            public void success(FeedItem feedItem, Response response) {
-                FeedItemActivity.this.mFeedItem = feedItem;
-                mFeedItem.save();
-            }
+            FeedoApiHelper.getFeedoService().updateFeedItem(mFeedItem.feed.serverId, mFeedItem.serverId, mFeedItem, new Callback<FeedItem>() {
+                @Override
+                public void success(FeedItem feedItem, Response response) {
+                    FeedItemActivity.this.mFeedItem = feedItem;
+                    mFeedItem.save();
+                }
 
-            @Override
-            public void failure(RetrofitError retrofitError) {
-                Log.e("feedo", "Error updating FeedItem", retrofitError);
-            }
-        });
+                @Override
+                public void failure(RetrofitError retrofitError) {
+                    Log.e("feedo", "Error updating FeedItem", retrofitError);
+                }
+            });
+        }
 
 
     }
 
     private void setupUI() {
-        String content = mFeedItem.content;
-        if(content.isEmpty())
-            content = mFeedItem.summary;
+        String content = "";
+        if(mFeedItem != null) {
+            content = mFeedItem.content;
+            if(content.isEmpty())
+                content = mFeedItem.summary;
+        }
         String html = "<html>" +
                 "<head>" +
                 "<style>img{\n" +
@@ -76,10 +89,15 @@ public class FeedItemActivity extends ActionBarActivity {
         String encoding = "utf-8";
 
         mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.loadDataWithBaseURL(mFeedItem.link, html, mime, encoding, null);
+        String link = "";
+        if(mFeedItem != null) {
+            link = mFeedItem.link;
+        }
+        mWebView.loadDataWithBaseURL(link, html, mime, encoding, null);
 
-
-        this.setTitle(mFeedItem.title);
+        if(mFeedItem != null) {
+            this.setTitle(mFeedItem.title);
+        }
     }
 
     private void setupActionBar() {

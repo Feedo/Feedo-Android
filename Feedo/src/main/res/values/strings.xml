@@ -1,18 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Feedo</string>
-    <string name="ralf">Ulf</string>
-    <string name="title_feed_list">Feeds</string>
-    <string name="title_feed_detail">Feed Detail</string>
-    <string name="title_activity_feed_item">FeedItemActivity</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_refresh">Refresh</string>
-    <string name="action_add">Add Feed</string>
-    <string name="title_activity_create_feed">CreateFeedActivity</string>
-    <string name="add_feed">Add Feed</string>
-    <string name="intro_add_feed">To add a Feed, simply put it\'s RSS or ATOM URL into the Textbox below and press the button.</string>
-    <string name="loading_add_feed">Adding Feed…</string>
-    <string name="delete">Delete</string>
 </resources>

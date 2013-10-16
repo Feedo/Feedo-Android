@@ -51,7 +51,7 @@ public class FeedItem extends Model implements Comparable<FeedItem> {
     @Expose
     public boolean read;
 
-    @Column(name = "serverId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "serverId", unique = true, onUniqueConflict = Column.ConflictAction.IGNORE)
     @Expose
     @SerializedName("id")
     public int serverId;

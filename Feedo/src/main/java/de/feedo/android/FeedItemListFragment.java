@@ -42,8 +42,6 @@ public class FeedItemListFragment extends ListFragment implements uk.co.senab.ac
     }
 
     public void refreshFeedItems() {
-        Log.i("feedo", getActivity().toString());
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -85,7 +83,7 @@ public class FeedItemListFragment extends ListFragment implements uk.co.senab.ac
                         refreshFeedItems();
                     }
                 });
-                mFeed.loadFeedItems(FeedItemListFragment.this.getActivity(), new Feed.FeedItemsUpdatedListener() {
+                mFeed.loadFeedItems(new Feed.FeedItemsUpdatedListener() {
                     @Override
                     public void updatingFinished(Feed feed) {
                         mHandler.post(new Runnable() {
@@ -105,7 +103,7 @@ public class FeedItemListFragment extends ListFragment implements uk.co.senab.ac
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             Intent intent = new Intent(getActivity(), FeedItemActivity.class);
-            intent.putExtra(FeedItemActivity.EXTRAS_KEY_FEED_ITEM_ID, mFeed.items().get(i).getId());
+            intent.putExtra(FeedItemActivity.EXTRAS_KEY_FEED_ITEM_ID, mFeedItemAdapter.getItem(i).getId());
             startActivity(intent);
         }
     };

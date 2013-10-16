@@ -269,7 +269,6 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
     private void refreshFeedList() {
         mFeeds = new Select().from(Feed.class).execute();
         Collections.sort(mFeeds);
-        Log.i("feed", mFeeds.toString());
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -289,15 +288,13 @@ public class FeedsActivity extends ActionBarActivity implements uk.co.senab.acti
                     @Override
                     public void run() {
                         for (Feed f : feeds) {
-                            try {
-                                if(f.items() != null) {
-                                    for(FeedItem fi : f.items())
-                                        fi.save();
-                                }
-                            } catch(NullPointerException e) {
-
-                            }
                             f.save();
+
+                            if(f.items() != null) {
+                                for(FeedItem fi : f.items())
+                                    fi.save();
+                            }
+
                         }
 
                         mHandler.post(new Runnable() {

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_add">Add Feed</string>
+    <string name="title_feed_list">Feeds</string>
+    <string name="delete_feed">Delete</string>
+</resources>

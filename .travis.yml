@@ -22,6 +22,7 @@ before_install:
   - echo yes | android update sdk --filter build-tools-18.1.1 --no-ui --force
   - echo yes | android update sdk --filter android-18 --no-ui --force
   - echo yes | android update sdk --filter sysimg-18 --no-ui --force
-  - echo yes | android update sdk --filter extra-android-support --no-ui --forc
+  - echo yes | android update sdk --filter extra-android-support --no-ui --force
+  - echo yes | android update sdk --filter extra-android-m2repository --no-ui --force
 script:
     - ./gradlew build

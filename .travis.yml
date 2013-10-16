@@ -31,5 +31,6 @@ script:
     - ./gradlew build
     
 after_success:
-    - bash dropbox_uploader.sh upload Feedo/build/apk/Feedo-release-unsigned.apk FeedoNightly.apk
-    - bash dropbox_uploader.sh share FeedoNightly.apk
+    - touch dropbox_conf_empty.conf
+    - bash dropbox_uploader.sh upload Feedo/build/apk/Feedo-release-unsigned.apk FeedoNightly.apk -f dropbox_conf_empty.conf 
+    - bash dropbox_uploader.sh share FeedoNightly.apk -f dropbox_conf_empty.conf 

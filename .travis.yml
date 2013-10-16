@@ -4,13 +4,13 @@ jdk: oraclejdk7
 
 env:
   matrix:
-  - ANDROID_SDKS=android-18,sysimg-18  ANDROID_TARGET=android-18  ANDROID_ABI=armeabi-v7a
+      - ANDROID_SDKS=android-18,sysimg-18  ANDROID_TARGET=android-18  ANDROID_ABI=armeabi-v7a
   global:
-  - secure: CKBn85dzZp7aUC4veGzvZrviZJA/y47nIiwHYi69MMqlDqAcL0szQue0w5250DNx1GHq+ZozzjJRTn71V0AgpytC6sQ5fpyufJbfy3jiMO1uRYOzu4iTijvSXJJQ+Pyn52/8o7B+YuaEHHYGyIU5NTlymsLysFGarT8cmeVpWD8=
-  - secure: Z9st7zY5GUdgVgBjaA2nn2D6cW/Yo8XRbSKjuNHnN0mPtIw5ALZq3b0fS87HK0DleAcOdZX5GuH9kx455CwuWL4a5UGTuoA134DRDMR7Dc4c9SNsz8P+V2nXZLMQSQWOSPY38d6yALcmK2xVU1xeAwJIK7ZPpqC7XjHcjAe3X0U=
-  - secure: P5oyy9JSNkfs0bGmZ4zBnvl2B4fzXDePX5c1T1toDHEiSZfCcf+aqFcxzrOzGtYs5CzlOVpEvVn5A/XVjZHkG9COtz1kRvHZ2UxGYf0hRgH5dhERQ/A6rYRtAZuobw6ycNH/IBcRgcuNrJJufA3w/OipfxPiNb4jrnR9DTpWiFc=
-  - secure: nIsALk2RszAd5vOdGLfd4Eugb/iYUtITOOrccQlM4r0aUfZUa4DIaqGAD9I9Fq0LhnTFMa3V/5nHSqhfcqrWlaV0o3x/L9h5DaUxSzKaZ0bnjqCmjAKwaN441tAVzfAZ0AblpYSjr6zS8HdlkJVF2Rcd1R7GbKLS8r3vvYPcYrs=
-  - secure: LvftlGN0dzp75VpIu8QBbdUTQuAd7dqaTEXCWP2w/gY3BD7rhqZDk50SGOwxp8onAj7zpRP6Ltjh/YL6jlxMqggwwPHDY8peTCYQ1qHIQt+KTOTkWmvXo0cbw+m6a6hhGtEsPZ8/KtOjnbQOPX/CSjTkDiK7h2IWPaqffWY4H6Q=
+      - secure: "dlybePpaOj7Hfa1STpzM/qhTe3yWKYoF30p+F3SdHSN5ke7158Xu+BXb9IxEEMgP1UKzOFUPWgmbxcYfMUw7uKKhmc2OrRjHfdVCOUzJZhbbqGaAceZWE/F7b/53NDql7LRF6jDHxsoUoTIQWuFjTJ6dUa5k5dQXE0fKYAp/DUE="
+      - secure: "CVyo7x5rlSrwQgUiw5y1W8QwqmnOJ2If0Wq8t1kkJY2iLCRcj5lvqVeBGnpnhKZ8a1D8Wqf4BXXsMzg3q55D0G67z/Y7Ewg4L6+V3xO0Pv+KaFCdw3GStMp8yOzz1oby6L2EwGlGOays9lokCmZeNZoiA0Q3/qlpcK+rLU/hG6Y="
+      - secure: "H7PxEjbwZZLOLpoKgqNkQqHDn4AYMEy2XyyovOKtU67gGC5KaP798Cs8CoIydOZOy19Z6h6om6yJzPLUMtQ5IKeBzyasCeG52TBVijB/BeP1uOCIuzCbELeYmZQFmHsTUZOXFj/YFTDLMb9P0t8qQB+8ygk7qvycai+etAZddmQ="
+      - secure: "OnWDITQVeHh556nUh1svw52kJva//nD2vVAg4sMejkAOfMSeNajdPhc0ePE1U99bH/ZOamuWeIu77eDbW2K3Hikd8SZFr/x0byoM/VlFsqNAlRrn9Ju9MyD4Vns8E2XFelo+xqtJbeIvRBK4xR4QcmVFXxyz6/tpke/OkKEP8lo="
+      - secure: "XpPRkUZbj7a+NKpuNuTILXtoaQADgxVKuHU0wSKEr2iLTw3MjOoYwp8YHzFcfUG2x5aRUW/HbRo6ZKSxJ2TcEN0idWwXwYNcsReD/t6OfogMQKZJutbrhxtUyFO5FPMmCk75VEIPdVjzqR0JV8NuTz/wIGcOP3w2rWpSEk+26dE="
   
 before_install:
     - sudo apt-get update -qq
@@ -26,7 +26,7 @@ before_install:
     - echo yes | android update sdk --filter sysimg-18 --no-ui --force
     - echo yes | android update sdk --filter extra-android-support --no-ui --force
     - echo yes | android update sdk --filter extra-android-m2repository --no-ui --force
-    - wget https://raw.github.com/graingert/Dropbox-Uploader/patch-1/dropbox_uploader.sh -O dropbox_uploader.sh
+    - wget https://raw.github.com/andreafabrizi/Dropbox-Uploader/master/dropbox_uploader.sh -O dropbox_uploader.sh
 script:
     - ./gradlew build
     
